@@ -107,7 +107,7 @@ html {
     margin-top: 25px;
     border-radius: 20px;
     padding: 1.4em 1em;
-    width: 600px;
+    width: 650px;
 }
 
 table.GeneratedTable {
@@ -189,4 +189,72 @@ table.horisontalTable thead tr th {
   background: #fff;
   border: none;
   font-weight: 100;
+}
+
+input[type=radio]{
+  width     : 2em;
+  margin    : 0;
+  padding   : 0;
+  font-size : 1em;
+  opacity   : 0;
+
+}
+input[type=radio]:checked ~ .pick-day{
+  opacity: 1;
+}
+.color-picking {
+  font-weight: bold;
+  position: relative;
+  cursor: pointer;
+}
+.pick-day {
+  opacity: .5;
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  border: 1px #111 solid;
+  display: inline-block;
+}
+
+
+.rotate {
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  cursor: pointer;
+  background-image: url('../img/refresh.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+  transition: all .5s;
+  margin: 0 auto;
+}
+.rotated {
+  transform: rotate(90deg);
+}
+
+
+
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all .5s
+}
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  
+
+}
+.fade-enter,
+.fade-leave-to
+.fade-leave-active
+{
+  transform: rotate(90deg);
+  opacity: 0;
 }

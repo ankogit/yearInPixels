@@ -22,15 +22,19 @@
 <body >
 <div id="app">
 <div class="container">
-    <label><input type="radio" name="day" data-type="1" value="bg-red" >Отличный</label> 
-    <label><input type="radio" name="day" data-type="2" value="bg-orange">Хороший</label>
-    <label><input type="radio" name="day" data-type="3" value="bg-yellow" >Обычный</label>
-    <label><input type="radio" name="day" data-type="4" value="bg-maroon">Устал</label>
-    <label><input type="radio" name="day" data-type="5" value="bg-blue">Плохой</label>
-    <label><input type="radio" name="day" data-type="6" value="bg-olive">Болею</label>
+    <label class="color-picking"><input type="radio" name="day" data-type="1" value="bg-red" ><span class="pick-day bg-red"></span>Отличный</label> 
+    <label class="color-picking"><input type="radio" name="day" data-type="2" value="bg-orange"><span class="pick-day bg-orange"></span>Хороший</label>
+    <label class="color-picking"><input type="radio" name="day" data-type="3" value="bg-yellow" ><span class="pick-day bg-yellow"></span>Обычный</label>
+    <label class="color-picking"><input type="radio" name="day" data-type="4" value="bg-maroon"><span class="pick-day bg-maroon"></span>Устал</label>
+    <label class="color-picking"><input type="radio" name="day" data-type="5" value="bg-blue"><span class="pick-day bg-blue"></span>Плохой</label>
+    <label class="color-picking"><input type="radio" name="day" data-type="6" value="bg-olive"><span class="pick-day bg-olive"></span>Болею</label>
 </div>
 
-<table class="horisontalTable GeneratedTable container">
+<div class="rotate" @click="changeView" :class="{rotated: isRotated}"></div>
+
+
+<transition name="fade" :duration="{ enter: 1000, leave: 0 }">
+<table class="horisontalTable GeneratedTable container" v-if="!isRotated">
   <thead>
     <tr>
       <th></th>
@@ -82,13 +86,16 @@
           'bg-olive' : Data[index][day-1] == 6,
           'cross-day': Data[index][day-1] == 7,
           'disabled-day': Data[index][day-1] == 8,
+          'cross-day': Data[index][day-1] == 0 && (index*31) + day <= ((currMonth-1) *31) + currDay - 7,
             }"
       ></td>
     </tr>
     
 </table>
+</transition>
 
-<table class="container GeneratedTable">
+<transition name="fade" :duration="{ enter: 1000, leave: 0 }">
+<table class="container GeneratedTable" v-if="isRotated">
   <thead>
     <tr>
       <th></th>
@@ -131,6 +138,8 @@
 
   </tbody>
 </table>
+</transition>
+
 
 </div>
 
@@ -160,18 +169,18 @@
           el: '#app',
           data: {
             Data: [
-            '2231212312312312313131231231261',
-            '1313131414143151416141513345188',
-            '2131231415151612316141235123123',
-            '1000000000000000000000000000008',
-            '0200000000000000000000000000000',
-            '0030000000000000000000000000008',
-            '0004000000000000000000000000000',
+            '0000000000000000000000000000000',
+            '0000000000000000000000550000088',
+            '5000005000500000500500000500000',
+            '0050500000005050000500050500008',
+            '0005000000000500000500500500000',
+            '0050500000005000000505000500008',
+            '0500050000050000000550000500000',
             '0000500000000000000050000000000',
-            '0000060000000000000000050000008',
-            '0000007000000000000000000500000',
-            '0000000500000000000000000000508',
-            '0000000050000000000000000000005'
+            '5000005000500000000500000500008',
+            '0000000000000000000000000000000',
+            '0000000000000000000000000000008',
+            '0000000000000000000000000000000'
             ],
             months: [
                 'я',
@@ -187,21 +196,24 @@
                 'н',
                 'д',
             ],
+            isRotated: false,
             year: '',
             currYear: '',
             currMonth: '',
             currDay: ''
           },
           created() {
-            this.fetchAll();
+            
             let d = new Date();
             this.currYear = d.getFullYear();
             this.currMonth = d.getMonth()+1;
             this.currDay = d.getDate();
+
+            this.fetchAll();
           },
           methods: {
             fetchAll () {
-                this.$http.get('1.php').then((response) => {
+                this.$http.get('/api/pixels/year/'+this.currYear+'/uid/1').then((response) => {
                     //this.Data = response.data;
                     console.log(response.data[0]);
                     this.year = response.data[0]['year']
@@ -224,12 +236,12 @@
             },
 
             updateDay(year, month, day, info) {
-                this.$http.post('1.php', {params: {year: year, month: month, day: day, info: info}}).then((response) => {
+                this.$http.get('/api/pixels/year/'+this.year+'/uid/1/type/update', {params: {year: year, month: month, day: day, info: info}}).then((response) => {
                     console.log(response.data);
                 })
             },
             submitDay(month, day, info) {
-                if((month*31) + day > ((this.currMonth-1) *31) + this.currDay - 7){
+                if((month*31) + day >= ((this.currMonth-1) *31) + this.currDay - 7){
                     if((month*31) + day < ((this.currMonth-1) *31) + this.currDay + 1) {
                         console.log('m')
                         if(info != "8" && info != "7") {
@@ -253,6 +265,9 @@
 
 
                 
+            },
+            changeView() {
+                this.isRotated = !this.isRotated;
             }
 
           }
